@@ -1,5 +1,7 @@
 DEVICE_NAMES = []
 
+CURRENT_DEVICE_ID = -1
+
 var host, port, error = false
 
 if (settings.read('send')) {
@@ -21,6 +23,12 @@ _receive = (address, ...args)=>{
     receive(host, port, address, ...args)
 }
 
+function setCurrentDeviceID () {
+    _receive('/EDIT', 'CURRENT_DEVICE_ID', {
+        value: CURRENT_DEVICE_ID,
+    })
+}
+
 function updateDeviceSelectionList ( ) {
     // Create widgets and add to list widget
 
@@ -38,8 +46,10 @@ function updateDeviceSelectionList ( ) {
                     linkId: '>> closeModal',
                     id: 'button_device_' + i,
                     label: DEVICE_NAMES[i].name,
-                    address: '/alsa/device/' + DEVICE_NAMES[i].index,
-                    preArgs: '',
+                    address: '/INTERNAL/SET_CURRENT_DEVICE_ID',
+                    preArgs: [
+                        DEVICE_NAMES[i].index
+                    ],
                     doubleClick: true,
                     on: ''
                 }
@@ -69,7 +79,7 @@ module.exports = {
         // args = array of {value, type} objects
         // host = string
         // port = integer
-        
+
         console.log("Received " + address)
 
         if ( address === '/echo' ) {
@@ -102,7 +112,7 @@ module.exports = {
 
             updateDeviceSelectionList()
 
-            return;
+            return
         }
 
         // return data if you want the message to be processed
@@ -125,6 +135,12 @@ module.exports = {
             DEVICE_NAMES = []
 
             updateDeviceSelectionList()
+        }
+
+        if ( address === '/INTERNAL/SET_CURRENT_DEVICE_ID' ) {
+            CURRENT_DEVICE_ID = args[0].value
+
+            return
         }
 
         // return data if you want the message to be and sent
