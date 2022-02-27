@@ -1,0 +1,6 @@
+= Open Stage Control module for ALSA
+
+[NOTE]
+====
+So far only compatible with my own implementation of an Open Sound Control server in the QasMixer, see https://github.com/amazingidiot/qastools
+====
